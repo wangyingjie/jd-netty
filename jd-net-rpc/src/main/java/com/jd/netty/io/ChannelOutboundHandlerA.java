@@ -9,8 +9,9 @@ public class ChannelOutboundHandlerA extends ChannelOutboundHandlerAdapter {
     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
         System.out.println("out A");
 
+        System.out.println("======================>" + msg);
         // super.write(ctx, msg, promise);
 
-        ctx.fireChannelRead(msg);
+        ctx.write(msg, promise);
     }
 }

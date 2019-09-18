@@ -6,20 +6,19 @@ import io.netty.channel.ChannelPromise;
 
 import java.util.concurrent.TimeUnit;
 
-public class ChannelOutboundHandlerB extends ChannelOutboundHandlerAdapter {
+public class ChannelOutboundHandlerC extends ChannelOutboundHandlerAdapter {
 
 
     @Override
     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-        System.out.println("out B");
-
+        System.out.println("out C" );
         System.out.println("======================>" + msg);
         // super.write(ctx, msg, promise);
 
         ctx.write(msg, promise);
     }
 
-    /*
+    // TODO 重要方法，不添加则 out 不会触发
     @Override
     public void handlerAdded(final ChannelHandlerContext ctx) throws Exception {
         ctx.executor().schedule(new Runnable() {
@@ -29,6 +28,5 @@ public class ChannelOutboundHandlerB extends ChannelOutboundHandlerAdapter {
             }
         },3, TimeUnit.SECONDS);
     }
-    */
 
 }

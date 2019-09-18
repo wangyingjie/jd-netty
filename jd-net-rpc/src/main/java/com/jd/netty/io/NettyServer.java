@@ -1,17 +1,16 @@
 package com.jd.netty.io;
 
+import com.jd.netty.pipeline.handler.*;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.*;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.ChannelPipeline;
 import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.ServerSocketChannel;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.codec.serialization.ClassResolvers;
-import io.netty.handler.codec.serialization.ObjectDecoder;
-import io.netty.handler.codec.serialization.ObjectEncoder;
 
 public class NettyServer {
-
 
 
     public static void main(String[] args) {
@@ -22,26 +21,29 @@ public class NettyServer {
 
     private static void start() {
 
-        NioEventLoopGroup group = new NioEventLoopGroup();
+        NioEventLoopGroup bossGroup = new NioEventLoopGroup();
+        NioEventLoopGroup workerGroup = new NioEventLoopGroup();
 
         ServerBootstrap bootstrap = new ServerBootstrap();
 
         try {
-            bootstrap.group(group)
+            bootstrap.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel ch) throws Exception {
                             // netty 大动脉
                             ChannelPipeline pipeline = ch.pipeline();
-                            pipeline.addLast("encoder", new ObjectEncoder());
-                            pipeline.addLast("decoder", new ObjectDecoder(Integer.MAX_VALUE, ClassResolvers.cacheDisabled(null)));
 
-                            pipeline.addLast(new ChannelInboundHandlerA());
-                            pipeline.addLast(new ChannelInboundHandlerB());
+                            // pipeline.addLast("encoder", new ObjectEncoder());
+                            // pipeline.addLast("decoder", new ObjectDecoder(Integer.MAX_VALUE, ClassResolvers.cacheDisabled(null)));
 
-                            pipeline.addLast(new ChannelOutboundHandlerA());
-                            pipeline.addLast(new ChannelOutboundHandlerB());
+                            ch.pipeline().addLast(new ChannelInboundHandlerA());
+                            ch.pipeline().addLast(new ChannelInboundHandlerB());
+
+                            ch.pipeline().addLast(new ChannelOutboundHandlerA());
+                            ch.pipeline().addLast(new ChannelOutboundHandlerB());
+                            ch.pipeline().addLast(new ChannelOutboundHandlerC());
 
                         }
                     })
@@ -57,8 +59,8 @@ public class NettyServer {
         } catch (InterruptedException e) {
             e.printStackTrace();
         } finally {
-
-
+            workerGroup.shutdownGracefully();
+            bossGroup.shutdownGracefully();
         }
     }
 }
