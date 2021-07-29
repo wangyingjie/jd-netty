@@ -11,6 +11,7 @@ import java.util.Map;
 @Data
 public class Request {
 
+
     private Map<String, Object> parameter = new HashMap<>();
 
     private InputStream inputStream;
